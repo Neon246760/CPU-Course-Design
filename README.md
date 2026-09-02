@@ -1,0 +1,60 @@
+# CPU Course Design
+
+本仓库实现 `docs/核心设计文档` 规定的五级流水 CPU，并已加入四项附加功能：
+
+- 27 条 RV32I 教学子集指令；
+- ID 级水平微码控制；
+- EX/MEM、MEM/WB 数据前递；
+- load-use 停顿；
+- EX 级分支/跳转判定和流水线冲刷；
+- 字/字节加载存储；
+- 指令、数据存储器握手接口；
+- GPIO、UART 发送、LCD SPI 和仿真 `TOHOST` MMIO；
+- 周期、退休、数据停顿、取指等待、数据存储等待和控制冲刷计数器。
+- `ADD/SUB/ADDI` 有符号溢出检测与异常入口；
+- 外部中断同步、pending、屏蔽、`mepc/mcause/mtvec` 和 `MRET`；
+- 1 KiB 直接映射 I-Cache 与 D-Cache；
+- 16 项 BTB + 2 位饱和计数器 BHT 动态分支预测。
+
+详细语义和验证矩阵见 `docs/附加功能设计与测试.md`。EES-338 下板设计与操作分别见
+`docs/EES-338下板方案.md` 和 `docs/Vivado下板操作.md`。
+
+## 目录
+
+```text
+rtl/       可综合 SystemVerilog RTL
+sim/       自检 testbench 与 Vivado 仿真脚本
+docs/      设计规格
+```
+
+## Vivado 2019.2 仿真
+
+在 Vivado Tcl Shell 中从仓库根目录执行：
+
+```tcl
+vivado -mode batch -source sim/vivado_sim.tcl
+```
+
+上述命令默认运行四项附加功能联合系统测试。运行全部 10 组测试：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File sim/run_all_tests.ps1
+```
+
+运行单项测试：
+
+```tcl
+vivado -mode batch -source sim/run_test.tcl -tclargs tb_cache sim/unit/tb_cache.sv
+```
+
+脚本默认使用说明书标准版 EES-338 的 `xc7a35tcsg324-1`。若 Hardware Manager
+识别到的是 100T 版本，生成 bitstream 时必须显式指定 `xc7a100tcsg324-1`：
+
+```powershell
+vivado -mode batch -source sim/implement_ees338.tcl
+vivado -mode batch -source sim/implement_ees338.tcl -tclargs xc7a100tcsg324-1
+```
+
+输出位于临时目录 `build/ees338/ees338_top.bit`（`build/` 已被 Git 忽略）。仓库不保存
+Vivado `.xpr`、`.runs`、`.cache` 等工程产物；请按照 `docs/Vivado下板操作.md`
+在仓库之外创建工程，并将综合顶层设置为 `ees338_top`。
