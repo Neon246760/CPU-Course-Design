@@ -66,4 +66,4 @@ EX/MEM 中的 load 数据尚不可用，因此当 `EX/MEM.mem_read=1` 时不得�
 | JAL | 恒为真 | `id_ex.pc + id_ex.imm` |
 | JALR | 恒为真 | `(forwarded_rs1 + id_ex.imm) & 32'hFFFF_FFFE` |
 
-基础版静态预测“不跳转”，所以不跳转分支不冲刷；taken 分支与所有跳转冲刷 IF/ID、ID/EX 两条年轻指令。
+当关闭分支预测器时，等价于静态预测“不跳转”；taken 分支与所有跳转会冲刷 IF/ID、ID/EX。开启 BTB+BHT 时，EX 级比较实际下一 PC 与预测下一 PC，仅在不一致时冲刷并重定向。

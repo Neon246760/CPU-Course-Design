@@ -19,6 +19,7 @@ foreach source_dir {execute regfile memory cache predictor exception core periph
 }
 add_files -norecurse $rtl_sources
 add_files -norecurse [file join $root_dir firmware bringup.mem]
+add_files -norecurse [file join $root_dir firmware tetris.mem]
 set_property file_type SystemVerilog [get_files -of_objects [get_filesets sources_1] *.sv]
 
 set tb_source [file join $root_dir sim system tb_extended_system.sv]

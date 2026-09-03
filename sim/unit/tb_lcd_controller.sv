@@ -8,6 +8,11 @@ module tb_lcd_controller;
   logic [7:0] tx_data;
   logic reinit_req;
   logic clear_req;
+  logic demo_req;
+  logic game_row_write;
+  logic [4:0] game_row_index;
+  logic [9:0] game_row_data;
+  logic game_refresh_req;
   logic tx_ready;
   logic initialized;
   logic lcd_cs_n;
@@ -32,6 +37,9 @@ module tb_lcd_controller;
   ) dut (
     .clk(clk), .reset(reset), .tx_valid(tx_valid), .tx_rs(tx_rs),
     .tx_data(tx_data), .reinit_req(reinit_req), .clear_req(clear_req),
+    .demo_req(demo_req),
+    .game_row_write(game_row_write), .game_row_index(game_row_index),
+    .game_row_data(game_row_data), .game_refresh_req(game_refresh_req),
     .tx_ready(tx_ready), .initialized(initialized), .lcd_cs_n(lcd_cs_n),
     .lcd_rst_n(lcd_rst_n), .lcd_sck(lcd_sck), .lcd_mosi(lcd_mosi),
     .lcd_rs(lcd_rs)
@@ -59,6 +67,11 @@ module tb_lcd_controller;
     tx_data = 8'b0;
     reinit_req = 1'b0;
     clear_req = 1'b0;
+    demo_req = 1'b0;
+    game_row_write = 1'b0;
+    game_row_index = 5'b0;
+    game_row_data = 10'b0;
+    game_refresh_req = 1'b0;
     captured = 8'b0;
     last_rs = 1'b0;
     captured_bits = 0;
@@ -94,6 +107,33 @@ module tb_lcd_controller;
     wait (initialized);
     if (transfers != 51)
       $fatal(1, "LCD clear transfer count=%0d", transfers);
+
+    @(negedge clk);
+    demo_req <= 1'b1;
+    @(negedge clk);
+    demo_req <= 1'b0;
+    wait (!tx_ready);
+    wait (tx_ready);
+    if (transfers != 186)
+      $fatal(1, "LCD demo transfer count=%0d", transfers);
+    if (captured !== 8'h00 || last_rs !== 1'b1)
+      $fatal(1, "LCD demo final byte=%h rs=%b", captured, last_rs);
+
+    @(negedge clk);
+    game_row_index <= 5'd19;
+    game_row_data <= 10'h3FF;
+    game_row_write <= 1'b1;
+    @(negedge clk);
+    game_row_write <= 1'b0;
+    game_refresh_req <= 1'b1;
+    @(negedge clk);
+    game_refresh_req <= 1'b0;
+    wait (!tx_ready);
+    wait (tx_ready);
+    if (transfers != 2216)
+      $fatal(1, "LCD game refresh transfer count=%0d", transfers);
+    if (captured !== 8'h00 || last_rs !== 1'b1)
+      $fatal(1, "LCD game final byte=%h rs=%b", captured, last_rs);
 
     $display("PASS tb_lcd_controller");
     $finish;

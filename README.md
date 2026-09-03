@@ -10,6 +10,9 @@
 - 字/字节加载存储；
 - 指令、数据存储器握手接口；
 - GPIO、UART 发送、LCD SPI 和仿真 `TOHOST` MMIO；
+- 启动自检后拨动 `SW0` 可在 LCD 显示 `WJL ZXH QBA`；
+- 10×20 俄罗斯方块：CPU 汇编实现移动、旋转、碰撞、锁定与消行，LCD 硬件加速绘制，
+  消行时由板载蜂鸣器播放约 120 ms 提示音；
 - 周期、退休、数据停顿、取指等待、数据存储等待和控制冲刷计数器。
 - `ADD/SUB/ADDI` 有符号溢出检测与异常入口；
 - 外部中断同步、pending、屏蔽、`mepc/mcause/mtvec` 和 `MRET`；
@@ -35,7 +38,7 @@ docs/      设计规格
 vivado -mode batch -source sim/vivado_sim.tcl
 ```
 
-上述命令默认运行四项附加功能联合系统测试。运行全部 10 组测试：
+上述命令默认运行四项附加功能联合系统测试。运行全部 12 组测试：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File sim/run_all_tests.ps1
@@ -46,6 +49,22 @@ powershell -ExecutionPolicy Bypass -File sim/run_all_tests.ps1
 ```tcl
 vivado -mode batch -source sim/run_test.tcl -tclargs tb_cache sim/unit/tb_cache.sv
 ```
+
+## 俄罗斯方块固件
+
+板级顶层默认加载 `firmware/tetris.mem`。操作方式：`SW0` 开始/重新开始；游戏手柄
+左/右键移动，上键旋转，下键加速下落。物理映射为下=`PB0`、左=`PB1`、中=`PB2`、
+上=`PB3`、右=`PB4`；中键 `PB2` 保留给外部中断。
+每次锁定若消除一行或多行，板载蜂鸣器都会播放一次约 2 kHz、120 ms 的短音。
+
+修改 `firmware/tetris.S` 后，使用本机 RARS 重新生成内存镜像：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File firmware/build_tetris.ps1
+```
+
+如 RARS 位于其他位置，可传入 `-RarsJar <路径>`。诊断固件 `bringup.mem` 仍保留，
+系统仿真会显式选择它，不受板级默认固件变化影响。
 
 脚本默认使用说明书标准版 EES-338 的 `xc7a35tcsg324-1`。若 Hardware Manager
 识别到的是 100T 版本，生成 bitstream 时必须显式指定 `xc7a100tcsg324-1`：

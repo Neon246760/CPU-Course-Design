@@ -1,8 +1,11 @@
 module ees338_top #(
-  parameter IMEM_INIT_FILE = "bringup.mem",
+  parameter IMEM_INIT_FILE = "tetris.mem",
   parameter logic ENABLE_ICACHE = 1'b0,
   parameter logic ENABLE_DCACHE = 1'b0,
-  parameter logic ENABLE_BRANCH_PREDICTION = 1'b0
+  parameter logic ENABLE_BRANCH_PREDICTION = 1'b0,
+  parameter integer KEY_DEBOUNCE_CYCLES = 500_000,
+  parameter integer BUZZER_BEEP_CYCLES = 3_000_000,
+  parameter integer BUZZER_HALF_PERIOD_CYCLES = 6_250
 ) (
   input  logic       sys_clk,
   input  logic       reset_n,
@@ -16,7 +19,8 @@ module ees338_top #(
   output logic [7:0] lcd_d,
   output logic       lcd_cs_n,
   output logic       lcd_rst_n,
-  output logic       lcd_rs
+  output logic       lcd_rs,
+  output logic       buzzer
 );
   logic cpu_clk;
   logic cpu_reset;
@@ -24,7 +28,24 @@ module ees338_top #(
   logic [7:0] sw_meta;
   logic [7:0] sw_sync;
   logic [4:0] key_meta;
+  logic [4:0] key_sync_raw;
   logic [4:0] key_sync;
+  localparam integer KEY_DEBOUNCE_WIDTH =
+      (KEY_DEBOUNCE_CYCLES <= 1) ? 1 : $clog2(KEY_DEBOUNCE_CYCLES);
+  localparam logic [KEY_DEBOUNCE_WIDTH-1:0] KEY_DEBOUNCE_LIMIT =
+      KEY_DEBOUNCE_CYCLES - 1;
+  logic [KEY_DEBOUNCE_WIDTH-1:0] key_debounce_count [0:4];
+  localparam integer BUZZER_BEEP_WIDTH =
+      (BUZZER_BEEP_CYCLES <= 1) ? 1 : $clog2(BUZZER_BEEP_CYCLES);
+  localparam integer BUZZER_DIVIDER_WIDTH =
+      (BUZZER_HALF_PERIOD_CYCLES <= 1) ? 1 : $clog2(BUZZER_HALF_PERIOD_CYCLES);
+  localparam logic [BUZZER_BEEP_WIDTH-1:0] BUZZER_BEEP_LIMIT =
+      BUZZER_BEEP_CYCLES - 1;
+  localparam logic [BUZZER_DIVIDER_WIDTH-1:0] BUZZER_DIVIDER_LIMIT =
+      BUZZER_HALF_PERIOD_CYCLES - 1;
+  logic [BUZZER_BEEP_WIDTH-1:0] buzzer_beep_count;
+  logic [BUZZER_DIVIDER_WIDTH-1:0] buzzer_divider_count;
+  logic buzzer_trigger;
   logic [31:0] gpio_in;
   logic [31:0] gpio_out;
   logic uart_tx_valid;
@@ -38,6 +59,11 @@ module ees338_top #(
   logic lcd_initialized;
   logic lcd_reinit;
   logic lcd_clear;
+  logic lcd_demo;
+  logic lcd_game_row_write;
+  logic [4:0] lcd_game_row_index;
+  logic [9:0] lcd_game_row_data;
+  logic lcd_game_refresh;
   logic lcd_sck;
   logic lcd_mosi;
   logic tohost_valid;
@@ -60,7 +86,13 @@ module ees338_top #(
       sw_meta <= 8'b0;
       sw_sync <= 8'b0;
       key_meta <= 5'b0;
+      key_sync_raw <= 5'b0;
       key_sync <= 5'b0;
+      buzzer <= 1'b0;
+      buzzer_beep_count <= '0;
+      buzzer_divider_count <= '0;
+      for (integer key_index = 0; key_index < 5; key_index = key_index + 1)
+        key_debounce_count[key_index] <= '0;
       uart_rxd_meta <= 1'b1;
       uart_rxd_sync <= 1'b1;
       heartbeat_count <= 25'b0;
@@ -69,7 +101,39 @@ module ees338_top #(
       sw_meta <= sw;
       sw_sync <= sw_meta;
       key_meta <= key;
-      key_sync <= key_meta;
+      key_sync_raw <= key_meta;
+      // A mechanical contact may alternate several times around each press or
+      // release.  Accept a new level only after it has remained unchanged for
+      // KEY_DEBOUNCE_CYCLES.  At 25 MHz the board default is about 20 ms.
+      for (integer key_index = 0; key_index < 5; key_index = key_index + 1) begin
+        if (key_sync_raw[key_index] == key_sync[key_index]) begin
+          key_debounce_count[key_index] <= '0;
+        end else if ((KEY_DEBOUNCE_CYCLES <= 1) ||
+                     (key_debounce_count[key_index] == KEY_DEBOUNCE_LIMIT)) begin
+          key_sync[key_index] <= key_sync_raw[key_index];
+          key_debounce_count[key_index] <= '0;
+        end else begin
+          key_debounce_count[key_index] <= key_debounce_count[key_index] + 1'b1;
+        end
+      end
+      if (buzzer_trigger) begin
+        // Restart one 120 ms, approximately 2 kHz beep for each trigger.
+        buzzer <= 1'b1;
+        buzzer_beep_count <= BUZZER_BEEP_LIMIT;
+        buzzer_divider_count <= '0;
+      end else if (buzzer_beep_count != 0) begin
+        buzzer_beep_count <= buzzer_beep_count - 1'b1;
+        if ((BUZZER_HALF_PERIOD_CYCLES <= 1) ||
+            (buzzer_divider_count == BUZZER_DIVIDER_LIMIT)) begin
+          buzzer <= ~buzzer;
+          buzzer_divider_count <= '0;
+        end else begin
+          buzzer_divider_count <= buzzer_divider_count + 1'b1;
+        end
+      end else begin
+        buzzer <= 1'b0;
+        buzzer_divider_count <= '0;
+      end
       uart_rxd_meta <= uart_rxd;
       uart_rxd_sync <= uart_rxd_meta;
       heartbeat_count <= heartbeat_count + 1'b1;
@@ -101,6 +165,11 @@ module ees338_top #(
     .tx_data(lcd_tx_data),
     .reinit_req(lcd_reinit),
     .clear_req(lcd_clear),
+    .demo_req(lcd_demo),
+    .game_row_write(lcd_game_row_write),
+    .game_row_index(lcd_game_row_index),
+    .game_row_data(lcd_game_row_data),
+    .game_refresh_req(lcd_game_refresh),
     .tx_ready(lcd_tx_ready),
     .initialized(lcd_initialized),
     .lcd_cs_n(lcd_cs_n),
@@ -126,7 +195,7 @@ module ees338_top #(
   ) u_soc (
     .clk(cpu_clk),
     .reset(cpu_reset),
-    .ext_irq(key_sync[0]),
+    .ext_irq(key_sync[2]),
     .gpio_in(gpio_in),
     .uart_tx_ready(uart_tx_ready),
     .lcd_tx_ready(lcd_tx_ready),
@@ -139,6 +208,12 @@ module ees338_top #(
     .lcd_tx_data(lcd_tx_data),
     .lcd_reinit(lcd_reinit),
     .lcd_clear(lcd_clear),
+    .lcd_demo(lcd_demo),
+    .lcd_game_row_write(lcd_game_row_write),
+    .lcd_game_row_index(lcd_game_row_index),
+    .lcd_game_row_data(lcd_game_row_data),
+    .lcd_game_refresh(lcd_game_refresh),
+    .buzzer_trigger(buzzer_trigger),
     .tohost_valid(tohost_valid),
     .tohost_data(tohost_data)
   );
@@ -152,7 +227,7 @@ module ees338_top #(
         uart_busy,
         cpu_reset,
         clk_locked,
-        key_sync[0],
+        key_sync[2],
         heartbeat_count[24]
       };
     end else begin

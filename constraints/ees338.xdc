@@ -35,6 +35,9 @@ set_property -dict {PACKAGE_PIN G3 IOSTANDARD LVCMOS33} [get_ports {led[5]}]
 set_property -dict {PACKAGE_PIN G4 IOSTANDARD LVCMOS33} [get_ports {led[6]}]
 set_property -dict {PACKAGE_PIN F6 IOSTANDARD LVCMOS33} [get_ports {led[7]}]
 
+## On-board buzzer; high drives the N-channel MOSFET gate
+set_property -dict {PACKAGE_PIN G13 IOSTANDARD LVCMOS33 DRIVE 8 SLEW SLOW} [get_ports buzzer]
+
 ## CP2102 USB-UART (FPGA TX goes to CP2102 RX)
 set_property -dict {PACKAGE_PIN T4 IOSTANDARD LVCMOS33} [get_ports uart_txd]
 set_property -dict {PACKAGE_PIN N5 IOSTANDARD LVCMOS33} [get_ports uart_rxd]

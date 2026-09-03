@@ -18,7 +18,7 @@ foreach source_dir {decode execute regfile memory cache predictor exception core
 }
 
 read_xdc [file join $root_dir constraints ees338.xdc]
-read_mem [file join $root_dir firmware bringup.mem]
+read_mem [file join $root_dir firmware tetris.mem]
 
 synth_design -top ees338_top -part $part_name
 report_utilization -file [file join $output_dir utilization.rpt]

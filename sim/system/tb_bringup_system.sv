@@ -11,9 +11,12 @@ module tb_bringup_system;
   logic [7:0] lcd_tx_data;
   logic lcd_reinit;
   logic lcd_clear;
+  logic lcd_demo;
   logic tohost_valid;
   logic [31:0] tohost_data;
   logic lcd_initialized;
+  logic [31:0] gpio_in;
+  logic saw_tohost;
   integer cycles;
   integer uart_bytes;
   integer lcd_commands;
@@ -27,7 +30,7 @@ module tb_bringup_system;
     .ENABLE_DCACHE(1'b0),
     .ENABLE_BRANCH_PREDICTION(1'b0)
   ) dut (
-    .clk(clk), .reset(reset), .ext_irq(1'b0), .gpio_in(32'b0),
+    .clk(clk), .reset(reset), .ext_irq(1'b0), .gpio_in(gpio_in),
     .uart_tx_ready(1'b1),
     .lcd_tx_ready(1'b1),
     .lcd_initialized(lcd_initialized),
@@ -36,6 +39,7 @@ module tb_bringup_system;
     .lcd_tx_valid(lcd_tx_valid), .lcd_tx_rs(lcd_tx_rs),
     .lcd_tx_data(lcd_tx_data), .lcd_reinit(lcd_reinit),
     .lcd_clear(lcd_clear), .tohost_valid(tohost_valid),
+    .lcd_demo(lcd_demo),
     .tohost_data(tohost_data)
   );
 
@@ -45,6 +49,8 @@ module tb_bringup_system;
     clk = 1'b0;
     reset = 1'b1;
     lcd_initialized = 1'b0;
+    gpio_in = 32'b0;
+    saw_tohost = 1'b0;
     cycles = 0;
     uart_bytes = 0;
     lcd_commands = 0;
@@ -67,7 +73,12 @@ module tb_bringup_system;
         if (uart_bytes != 10) $fatal(1, "Bring-up UART bytes=%0d", uart_bytes);
         if (lcd_commands != 3 || lcd_data_bytes != 256)
           $fatal(1, "Bring-up LCD cmd=%0d data=%0d", lcd_commands, lcd_data_bytes);
-        $display("PASS tb_bringup_system cycles=%0d", cycles);
+        saw_tohost <= 1'b1;
+        gpio_in[0] <= 1'b1; // emulate switching SW0 on
+      end
+      if (lcd_demo) begin
+        if (!saw_tohost) $fatal(1, "LCD demo triggered before bring-up PASS");
+        $display("PASS tb_bringup_system cycles=%0d SW0 name demo", cycles);
         $finish;
       end
       if (cycles > 10000) $fatal(1, "Bring-up timeout");

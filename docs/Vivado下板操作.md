@@ -85,24 +85,28 @@ D:\VivadoProjects\CPU-Course-Design-EES338
 
 板级综合必须使用 `ees338_top`，不能把 `soc_top` 或测试平台设为综合顶层。
 
-## 4. 添加上电程序 `bringup.mem`
+## 4. 添加上电程序 `tetris.mem`
 
 1. 再次点击 **Add Sources**。
 2. 选择 **Add or create design sources**。
 3. 点击 **Add Files**，选择：
 
    ```text
-   D:\2_files\2_academic\1_course\CPU-Course-Design\firmware\bringup.mem
+   D:\2_files\2_academic\1_course\CPU-Course-Design\firmware\tetris.mem
    ```
 
 4. 取消勾选 **Copy sources into project**，然后完成向导。
-5. 在 Sources 中选中 `bringup.mem`，打开 **Source File Properties**，确认：
+5. 在 Sources 中选中 `tetris.mem`，打开 **Source File Properties**，确认：
 
    - `File Type` 为 **Memory Initialization Files**；
    - `Used In` 至少包含 **Synthesis** 和 **Simulation**。
 
-这一步不能遗漏，否则综合可能找不到 `$readmemh("bringup.mem")`，生成的 CPU 将没有正确的
+这一步不能遗漏，否则综合可能找不到 `$readmemh("tetris.mem")`，生成的 CPU 将没有正确的
 上电程序。
+
+`bringup.mem` 是保留的板级诊断固件，不是当前综合顶层的默认程序。如需临时恢复诊断，
+可同时导入它，并将 `ees338_top` 的 `IMEM_INIT_FILE` 参数改为 `"bringup.mem"`；恢复游戏时
+改回 `"tetris.mem"`。
 
 ## 5. 添加 EES-338 引脚约束
 
@@ -124,6 +128,7 @@ D:\VivadoProjects\CPU-Course-Design-EES338
 - 低有效复位 `P15`；
 - 8 个拨码开关和 5 个按键；
 - 8 个 LED；
+- 板载蜂鸣器 `G13`；
 - CP2102 USB-UART 的 `T4/N5`；
 - ST7571 LCD 的 SPI/控制信号；
 - `LVCMOS33`、配置电压和必要的异步输入时序例外。
@@ -144,7 +149,7 @@ D:\VivadoProjects\CPU-Course-Design-EES338
 - `soc_top.sv`；
 - `uart_tx_phy.sv`；
 - `lcd_controller.sv` 和 `lcd_spi_master.sv`；
-- `bringup.mem`；
+- `tetris.mem`；
 - `ees338.xdc`。
 
 ## 7. 运行综合
@@ -229,7 +234,7 @@ get_property DIRECTORY [get_runs impl_1]
 JTAG 下载写入的是 FPGA 易失配置存储，开发板断电后会丢失；再次上电需要重新下载。
 在 JTAG 验证完全通过前，不建议直接烧写板载 SPI Flash。
 
-## 12. 打开串口并验收
+## 12. 运行俄罗斯方块并验收
 
 用任意串口终端打开 CP2102 对应 COM 口，设置：
 
@@ -241,33 +246,19 @@ no parity
 no flow control
 ```
 
-下载或按下低有效复位键后，应先收到：
+下载或按下低有效复位键后，LCD 先完成约 0.6 秒的初始化和清屏。随后：
 
-```text
-BOOT
-```
+1. 将 `SW0` 拨到 1，屏幕出现 10×20 俄罗斯方块棋盘和首个 I 方块；
+2. 游戏手柄左键（`PB1`）左移，右键（`PB4`）右移；
+3. 上键（`PB3`）顺时针旋转，按住下键（`PB0`）加速下落；
+4. 填满一行后该行消除，上方内容下移，同时板载蜂鸣器发出约 120 ms 的短音；
+5. 方块堆到顶部后，LED 显示 `0x55`。先将 `SW0` 拨回 0，再拨到 1 可重新开始。
 
-约 0.6 秒后，LCD 完成初始化和清屏，第一页写入 `0xAA` 测试条纹，然后串口输出：
+手柄中键（`PB2`）连接 CPU 外部中断，不是游戏按键，游戏过程中应避免按下。串口保持
+空闲；需要 `BOOT/PASS` 自检输出时，请改用第 4 节说明的 `bringup.mem`。
 
-```text
-PASS
-```
-
-板上现象：
-
-- `SW7=0`：自检成功后 8 个 LED 全亮；
-- LCD：出现测试条纹；
-- `SW7=1`：切换为调试显示；
-  - LED7：`TOHOST=PASS`；
-  - LED6：失败；
-  - LED5：LCD 初始化完成；
-  - LED4：UART 正忙；
-  - LED3：CPU 复位；
-  - LED2：MMCM 锁定；
-  - LED1：PB0 同步值；
-  - LED0：慢速心跳。
-
-按下复位键后，上述 `BOOT`、LCD 初始化、`PASS` 流程应重新执行。
+五个手柄按键在板级均使用约 20 ms 的稳定计数防抖。左、右、上键一次按压只产生一次
+移动或旋转；下键通过防抖后保持电平有效，因此按住时仍会连续加速下落。
 
 ## 13. 常见问题
 
@@ -294,7 +285,7 @@ wait_on_run impl_1
 等待实现完成后，重新选择新生成的 `ees338_top.bit`。不能通过改文件名、重新关联旧 bit
 或清空 `PROBES.FILE` 修复；必须针对 100T 重新综合、实现并生成 bitstream。
 
-### 综合报 `bringup.mem` 找不到
+### 综合报 `tetris.mem` 找不到
 
 重新执行第 4 节，把该文件作为 **Design Source** 添加，并设置为
 **Memory Initialization Files**，同时启用 Synthesis。
@@ -309,7 +300,11 @@ wait_on_run impl_1
 检查供电、JTAG 线、下载驱动和启动模式；关闭占用同一下载器的其他 Vivado/下载工具后
 重新 Auto Connect。
 
-### 没有串口输出
+### 游戏运行时没有串口输出
+
+这是预期现象，`tetris.mem` 不使用 UART。需要串口验证时改用诊断固件 `bringup.mem`。
+
+### 诊断固件没有串口输出
 
 确认使用的是 CP2102 对应 COM 口，参数为 115200 8N1，并确认约束使用 USB-UART 的
 T4/N5，而不是示例文件中属于蓝牙串口的 N2/L3。
@@ -321,7 +316,7 @@ CPU 已经运行，通常卡在等待 LCD 初始化。检查 LCD 接口、LCD �
 
 ## 14. 修改代码后的重新生成流程
 
-外部工程引用仓库源码时，保存 RTL 或 `bringup.mem` 后回到 Vivado：
+外部工程引用仓库源码时，保存 RTL 或重新生成 `tetris.mem` 后回到 Vivado：
 
 1. 点击 **Refresh Changed Modules**；
 2. 若已经有旧结果，右击 `synth_1` 选择 **Reset Runs**；

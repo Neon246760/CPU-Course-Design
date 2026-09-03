@@ -66,7 +66,18 @@ lcd_pattern:
         sw      x1, 0(x15)
 
 pass_loop:
-        jal     x0, pass_loop
+        lw      x12, 4(x10)           /* GPIO_IN: SW0 is bit 0 */
+        andi    x12, x12, 1
+        beq     x12, x0, pass_loop
+
+        addi    x1, x0, 4             /* LCD_CTRL.bit2: name demo */
+        sw      x1, 44(x10)
+
+wait_sw0_release:
+        lw      x12, 4(x10)
+        andi    x12, x12, 1
+        bne     x12, x0, wait_sw0_release
+        jal     x0, pass_loop          /* allow the next 0 -> 1 action */
 
 fail:
         addi    x1, x0, 0x55

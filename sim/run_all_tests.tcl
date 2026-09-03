@@ -9,9 +9,11 @@ set test_sources [list \
   [file join $root_dir sim unit tb_uart_tx_phy.sv] \
   [file join $root_dir sim unit tb_lcd_spi_master.sv] \
   [file join $root_dir sim unit tb_lcd_controller.sv] \
+  [file join $root_dir sim unit tb_ees338_key_debounce.sv] \
   [file join $root_dir sim system tb_cpu_core.sv] \
   [file join $root_dir sim system tb_extended_system.sv] \
-  [file join $root_dir sim system tb_bringup_system.sv]]
+  [file join $root_dir sim system tb_bringup_system.sv] \
+  [file join $root_dir sim system tb_tetris_system.sv]]
 
 set rtl_sources [list [file join $root_dir rtl decode control_word_pkg.sv]]
 foreach source_dir {decode execute regfile memory cache predictor exception core peripheral soc board} {
@@ -30,6 +32,7 @@ foreach tb_source $test_sources {
   set_property source_mgmt_mode None [current_project]
   add_files -norecurse $rtl_sources
   add_files -norecurse [file join $root_dir firmware bringup.mem]
+  add_files -norecurse [file join $root_dir firmware tetris.mem]
   set_property file_type SystemVerilog [get_files -of_objects [get_filesets sources_1] *.sv]
   add_files -fileset sim_1 -norecurse $tb_source
   set_property file_type SystemVerilog [get_files -of_objects [get_filesets sim_1] *.sv]

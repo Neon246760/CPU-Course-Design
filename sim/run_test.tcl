@@ -23,6 +23,7 @@ set_property target_language Verilog [current_project]
 set_property source_mgmt_mode None [current_project]
 add_files -norecurse $rtl_sources
 add_files -norecurse [file join $root_dir firmware bringup.mem]
+add_files -norecurse [file join $root_dir firmware tetris.mem]
 set_property file_type SystemVerilog [get_files -of_objects [get_filesets sources_1] *.sv]
 add_files -fileset sim_1 -norecurse $tb_source
 set_property file_type SystemVerilog [get_files -of_objects [get_filesets sim_1] *.sv]

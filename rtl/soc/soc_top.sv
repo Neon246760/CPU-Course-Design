@@ -22,6 +22,12 @@ module soc_top #(
   output logic [7:0]  lcd_tx_data,
   output logic        lcd_reinit,
   output logic        lcd_clear,
+  output logic        lcd_demo,
+  output logic        lcd_game_row_write,
+  output logic [4:0]  lcd_game_row_index,
+  output logic [9:0]  lcd_game_row_data,
+  output logic        lcd_game_refresh,
+  output logic        buzzer_trigger,
   output logic        tohost_valid,
   output logic [31:0] tohost_data,
   output logic [31:0] cycle_count,
@@ -77,6 +83,9 @@ module soc_top #(
   logic select_lcd_data;
   logic select_lcd_status;
   logic select_lcd_control;
+  logic select_lcd_game_row;
+  logic select_lcd_game_refresh;
+  logic select_buzzer;
   logic select_tohost;
   logic select_reserved;
   logic retire_valid;
@@ -148,6 +157,9 @@ module soc_top #(
     .select_lcd_data(select_lcd_data),
     .select_lcd_status(select_lcd_status),
     .select_lcd_control(select_lcd_control),
+    .select_lcd_game_row(select_lcd_game_row),
+    .select_lcd_game_refresh(select_lcd_game_refresh),
+    .select_buzzer(select_buzzer),
     .select_tohost(select_tohost), .select_reserved(select_reserved)
   );
 
@@ -168,6 +180,10 @@ module soc_top #(
       end else if (select_uart_tx) begin
         bus_ready = !bus_write || uart_tx_ready;
       end else if (select_lcd_cmd || select_lcd_data) begin
+        bus_ready = !bus_write || lcd_tx_ready;
+      end else if (select_lcd_game_row || select_lcd_game_refresh) begin
+        // Keep the software frame buffer coherent while the LCD renderer is
+        // consuming it. Writes resume as soon as the controller returns idle.
         bus_ready = !bus_write || lcd_tx_ready;
       end else begin
         bus_ready = 1'b1;
@@ -190,6 +206,12 @@ module soc_top #(
       lcd_tx_data <= 8'b0;
       lcd_reinit <= 1'b0;
       lcd_clear <= 1'b0;
+      lcd_demo <= 1'b0;
+      lcd_game_row_write <= 1'b0;
+      lcd_game_row_index <= 5'b0;
+      lcd_game_row_data <= 10'b0;
+      lcd_game_refresh <= 1'b0;
+      buzzer_trigger <= 1'b0;
       tohost_valid <= 1'b0;
       tohost_data <= 32'b0;
     end else begin
@@ -197,6 +219,10 @@ module soc_top #(
       lcd_tx_valid <= 1'b0;
       lcd_reinit <= 1'b0;
       lcd_clear <= 1'b0;
+      lcd_demo <= 1'b0;
+      lcd_game_row_write <= 1'b0;
+      lcd_game_refresh <= 1'b0;
+      buzzer_trigger <= 1'b0;
       tohost_valid <= 1'b0;
       if (bus_req && bus_ready && bus_write) begin
         if (select_gpio_out) begin
@@ -217,7 +243,17 @@ module soc_top #(
         if (select_lcd_control) begin
           lcd_reinit <= bus_wdata[0];
           lcd_clear <= bus_wdata[1];
+          lcd_demo <= bus_wdata[2];
         end
+        if (select_lcd_game_row) begin
+          lcd_game_row_write <= 1'b1;
+          lcd_game_row_index <= bus_wdata[20:16];
+          lcd_game_row_data <= bus_wdata[9:0];
+        end
+        if (select_lcd_game_refresh)
+          lcd_game_refresh <= bus_wdata[0];
+        if (select_buzzer)
+          buzzer_trigger <= bus_wdata[0];
         if (select_tohost) begin
           tohost_valid <= 1'b1;
           tohost_data <= bus_wdata;
