@@ -1,0 +1,2 @@
+workload,config,cycles,instret,stall_data,stall_fetch,stall_memory,flush,hw_branches,hw_mispredict,measured_branches,measured_mispredict,icache_hits,icache_misses,dcache_hits,dcache_misses,stores
+legacy_sort5,4,458,116,0,297,32,12,34,12,33,11,0,0,0,0,12

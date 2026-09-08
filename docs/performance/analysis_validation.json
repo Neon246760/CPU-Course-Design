@@ -1,0 +1,9 @@
+{
+  "cases": 42,
+  "repeats": 2,
+  "raw_hashes_verified": 84,
+  "all_retirement_traces_match_reference": true,
+  "all_ideal_cycle_decompositions_match": true,
+  "all_pipeline_rtl_hashes_match": true,
+  "routed_timing_reports_parsed": 2
+}

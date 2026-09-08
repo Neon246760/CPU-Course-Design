@@ -1,0 +1,113 @@
+{
+  "prepared_at": "2026-09-08T18:04:25.672229+08:00",
+  "rtl": [
+    {
+      "path": "rtl\\board\\clock_reset.sv",
+      "sha256": "d508258d52daebeacb771f0877872393fbcc34d5d594d6ad4b0a264c73d73e3c"
+    },
+    {
+      "path": "rtl\\board\\ees338_top.sv",
+      "sha256": "d983c141524b478bfbcedb49e9cdec144639e6ce5f0bdd6e66b2a52543d55b73"
+    },
+    {
+      "path": "rtl\\cache\\dcache.sv",
+      "sha256": "25ba0854093bf1b9e56c0d9aca61330309596cf6963940ad1fa39aef982bd46b"
+    },
+    {
+      "path": "rtl\\cache\\icache.sv",
+      "sha256": "134eb8d075a6ed49c398f4a34f299529a89be2c6265c3c3b376f1a57b6234250"
+    },
+    {
+      "path": "rtl\\core\\cpu_core.sv",
+      "sha256": "e97e36776d4f8433eef229cfa0c36018ab62a8c8028b134879ae43f3e9d475c6"
+    },
+    {
+      "path": "rtl\\core\\pipeline_ctrl.sv",
+      "sha256": "ce7dfcbc658bf7e0c659b36c2af039e5f55b3d47d40a9546ed93ed9eb1c3b548"
+    },
+    {
+      "path": "rtl\\decode\\control_word_pkg.sv",
+      "sha256": "bffffe4af15b9a6543e9f7def9f37fa406c2c51f854d7ee5b33a3713e06e26df"
+    },
+    {
+      "path": "rtl\\decode\\decoder.sv",
+      "sha256": "809b133f921535fe7d5387c771fea52c83a2254bde93e4112fb4648cd7654ae6"
+    },
+    {
+      "path": "rtl\\decode\\imm_gen.sv",
+      "sha256": "eb5408b31fbcd7bfad371750c755b2381be8a29ce4b82b880d6b41ead5c1e61f"
+    },
+    {
+      "path": "rtl\\decode\\microcode_rom.sv",
+      "sha256": "5c59bf57f66b5e70a735cc3353649dbe391bc1dd9df2a017cb1836ceb2f684ab"
+    },
+    {
+      "path": "rtl\\exception\\csr_file.sv",
+      "sha256": "5dbe8ba68c611ee8561ef43dd411d9f395cacb95fbd752d57875cabfec41b5f7"
+    },
+    {
+      "path": "rtl\\execute\\alu.sv",
+      "sha256": "391aabf18dd03f6206f44623d6d6628a4174ae2077020372eecfe19b26047ea3"
+    },
+    {
+      "path": "rtl\\execute\\branch_unit.sv",
+      "sha256": "6ca39d0ca213f0b0f5660c718c88c1fee10b0c91da754886b16783ce04db26c9"
+    },
+    {
+      "path": "rtl\\execute\\forwarding_unit.sv",
+      "sha256": "c1618a4bbe7e0bb7358eaa5718085dc216e93c875eb2918b06c8b79e2265efe4"
+    },
+    {
+      "path": "rtl\\execute\\hazard_unit.sv",
+      "sha256": "a795365c7e32f463c119f47e13820881c1339c0867a0787a8b1f4b729f5c6761"
+    },
+    {
+      "path": "rtl\\memory\\address_decoder.sv",
+      "sha256": "fd6ba0da276697ec01df90c5ec2744c30e6d38b5c4748b99c10552545f760d74"
+    },
+    {
+      "path": "rtl\\memory\\data_memory.sv",
+      "sha256": "5f3cca1177944231c0b62289d5862ddb163453cae2d401f04545b535419beb4e"
+    },
+    {
+      "path": "rtl\\memory\\instruction_memory.sv",
+      "sha256": "1bb884fb639c40f3ce5e15a8141eaeefc6f8262e75b83c3ecf2e4d0f159be31b"
+    },
+    {
+      "path": "rtl\\memory\\load_store_unit.sv",
+      "sha256": "7c620808e6ee2999048fb52b7d7c6220aaaecca96d8ba0df900b6e704bf80e69"
+    },
+    {
+      "path": "rtl\\peripheral\\lcd_controller.sv",
+      "sha256": "15e91033b2cb3589c5ab602935cc4502663e54093ed95c05ad14318b8fae7c82"
+    },
+    {
+      "path": "rtl\\peripheral\\lcd_spi_master.sv",
+      "sha256": "480d05a2738e8cdc77588aeee6a8ee9c254ea07ae96cb3141806ef3cc89ea692"
+    },
+    {
+      "path": "rtl\\peripheral\\uart_tx_phy.sv",
+      "sha256": "8bfcf3de77424b21fdec09707e1820eaa54bc8c3cef5090d6a5b34cfc8da73c9"
+    },
+    {
+      "path": "rtl\\predictor\\bht.sv",
+      "sha256": "a1399b7913e433f60ad4406ae3e5d3146a4b25e5a96f2ba9fec969062929c5d4"
+    },
+    {
+      "path": "rtl\\predictor\\branch_predictor.sv",
+      "sha256": "dbfc6ce8f2f9d1cb57240a235a705e433032fef5b1fb67f7c663752e9a6b9816"
+    },
+    {
+      "path": "rtl\\predictor\\btb.sv",
+      "sha256": "54e55ee63b8f70b9488dc9ef7682c8f8ae0037a59f7807069b1fdfa9fb94e664"
+    },
+    {
+      "path": "rtl\\regfile\\regfile.sv",
+      "sha256": "35d5e0612636757fc7d3f4f6f98567e07154ef5e12532d19d9f0087e1d58066d"
+    },
+    {
+      "path": "rtl\\soc\\soc_top.sv",
+      "sha256": "11ad3d179bebf8535d577ff59a3ef6baec82d492ae37ab68f5c48159844e51e3"
+    }
+  ]
+}

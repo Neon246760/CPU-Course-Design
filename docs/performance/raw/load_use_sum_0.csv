@@ -1,0 +1,2 @@
+workload,config,cycles,instret,stall_data,stall_fetch,stall_memory,flush,hw_branches,hw_mispredict,measured_branches,measured_mispredict,icache_hits,icache_misses,dcache_hits,dcache_misses,stores
+load_use_sum,0,786,786,0,0,0,0,0,0,259,0,0,0,0,0,0

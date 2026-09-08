@@ -1,0 +1,70 @@
+{
+  "legacy_root": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2",
+  "transformation": "Only whole-token module/type names receive perf_legacy_ prefix; no logic changes.",
+  "files": [
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\alu.v",
+      "original_sha256": "09b6932368e2a881076f93f5d1acdda6c8e5789d4d38be18603d84c9c145db24",
+      "snapshot": "sim\\performance\\legacy\\alu.v",
+      "snapshot_sha256": "45df2e6872de4558bb638b58c6d6a1ea85637586ab0f6df980dd435d6ef44291"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\control.v",
+      "original_sha256": "237a8402ddb7e7a8533ce65f456b82a75536628d128df56b53b590822a51b6ad",
+      "snapshot": "sim\\performance\\legacy\\control.v",
+      "snapshot_sha256": "e5f5960b3d0b41105356840b0a9473c16ca5764b2ff3f1c4073d437642b3d072"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\cpu_top.v",
+      "original_sha256": "0bc67606d6c54aef15a39b57bca006f83f87bffdae3eb462afdc97354b0561ce",
+      "snapshot": "sim\\performance\\legacy\\cpu_top.v",
+      "snapshot_sha256": "f6eba22b0ecd630dc297e9ebad344f9456bdc90e88401553595479c03768e0ed"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\dmem.v",
+      "original_sha256": "fde3311c03fc7350c2072518b862622e5e2bc2b54aea1fbebc8483d52ec177a5",
+      "snapshot": "sim\\performance\\legacy\\dmem.v",
+      "snapshot_sha256": "2960258a670b9dfc3d7f44285257a262ee9739d6edbaf72a7110e5fc62440c2b"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\imem.v",
+      "original_sha256": "20f61de376d61d34416f285f21058ec624de75c44707f7af75b6545251c900a5",
+      "snapshot": "sim\\performance\\legacy\\imem.v",
+      "snapshot_sha256": "9c96561f29a21cdffd43aed4eabb48a5fb90922479d2688f33a86d960a6286dc"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\imm_gen.v",
+      "original_sha256": "55703da1566bc32506c504d2127e3adae39b9ea63ebc7f851fc01885ec196088",
+      "snapshot": "sim\\performance\\legacy\\imm_gen.v",
+      "snapshot_sha256": "a3dece66d10790834f7b140927611081afb2e4bda6f6bc8232237a1a9022ca0a"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\regfile.v",
+      "original_sha256": "3ca2f7e56a09563c04454e8ba8f7e03acaf52faa2d5c1eefa9f6314ffb3fc5a4",
+      "snapshot": "sim\\performance\\legacy\\regfile.v",
+      "snapshot_sha256": "2a9c3d545e6b3f5b649706af8368e9841faab231f2782ee9895892e6328eca7b"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sources_1\\new\\rv32i_defs.vh",
+      "original_sha256": "0b274fcc71407c1cc7740f031616ccad6765f9e15816c12ec60d09be6a95c656",
+      "snapshot": "sim\\performance\\legacy\\rv32i_defs.vh",
+      "snapshot_sha256": "b0c11f29f594a12610ac51f93d2ac89d0e5b2b0a2cd94a6cf8fc353f4f888a9d"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sim_1\\new\\imem_sort.mem",
+      "original_sha256": "d2d5a331a335e1931c28bf7f047fd546b8c572ff063799d381a4c4bc8a4fa611"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.srcs\\sim_1\\new\\dmem_init.mem",
+      "original_sha256": "30ac2e27191e60cb322a390b45487d4f0f6295243abe925c5e8f51f36c80f313"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\riscv1.asm",
+      "original_sha256": "2be6b9a97764e16ef3163a779b23662cc411728c45df9c45bcf686e28be31a7b"
+    },
+    {
+      "original": "D:\\Neon\\BIT\\Grade3\\大三下\\计算机组成原理\\project\\lab2\\lab2.runs\\impl_1\\cpu_top_timing_summary_routed.rpt",
+      "original_sha256": "cb1046e7ac6ae8416787feb32306d856396d30085353094c759cac29c24cdcaa"
+    }
+  ]
+}
