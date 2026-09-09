@@ -19,3 +19,4 @@ tmp/
 usage_statistics_webtalk.html
 usage_statistics_webtalk.xml
 *.pyc
+.codex-ppt-build/
