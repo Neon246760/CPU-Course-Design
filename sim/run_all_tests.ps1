@@ -8,6 +8,7 @@ $tests = @(
   @('tb_lcd_spi_master', 'sim/unit/tb_lcd_spi_master.sv'),
   @('tb_lcd_controller', 'sim/unit/tb_lcd_controller.sv'),
   @('tb_cpu_core', 'sim/system/tb_cpu_core.sv'),
+  @('tb_pipeline_hazard', 'sim/system/tb_pipeline_hazard.sv'),
   @('tb_extended_system', 'sim/system/tb_extended_system.sv'),
   @('tb_bringup_system', 'sim/system/tb_bringup_system.sv')
 )

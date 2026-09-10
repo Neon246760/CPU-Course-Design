@@ -11,6 +11,7 @@ set test_sources [list \
   [file join $root_dir sim unit tb_lcd_controller.sv] \
   [file join $root_dir sim unit tb_ees338_key_debounce.sv] \
   [file join $root_dir sim system tb_cpu_core.sv] \
+  [file join $root_dir sim system tb_pipeline_hazard.sv] \
   [file join $root_dir sim system tb_extended_system.sv] \
   [file join $root_dir sim system tb_bringup_system.sv] \
   [file join $root_dir sim system tb_tetris_system.sv]]
